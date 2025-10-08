@@ -30,6 +30,8 @@ exports.handler = async (event, context) => {
       throw new Error('ANTHROPIC_API_KEY is not configured');
     }
 
+    console.log('Making request to Anthropic API...');
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -38,19 +40,21 @@ exports.handler = async (event, context) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-sonnet-20240229',  // FIXED: Correct model name
+        model: 'claude-3-5-sonnet-20241022',  // CORRECT MODEL NAME
         max_tokens: maxTokens || 4096,
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
+    const responseText = await response.text();
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', errorText);
-      throw new Error(`Anthropic API error: ${response.status}`);
+      console.error('Anthropic API error response:', responseText);
+      throw new Error(`Anthropic API error: ${response.status} - ${responseText}`);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
 
     return {
       statusCode: 200,
@@ -71,7 +75,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ 
         error: 'Internal server error', 
         details: error.message,
-        content: [{ text: 'Error: ' + error.message }]
+        content: [{ text: `Error: ${error.message}` }]
       })
     };
   }
