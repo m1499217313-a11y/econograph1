@@ -30,10 +30,11 @@ exports.handler = async (event, context) => {
       throw new Error('ANTHROPIC_API_KEY is not configured');
     }
 
-    // Validate base64 data
     if (!base64Data || base64Data.length === 0) {
       throw new Error('No PDF data provided');
     }
+
+    console.log('Making request to Anthropic API for PDF extraction...');
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -43,7 +44,7 @@ exports.handler = async (event, context) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-sonnet-20240229',  // FIXED: Correct model name
+        model: 'claude-3-5-sonnet-20241022',  // CORRECT MODEL NAME
         max_tokens: 4000,
         messages: [
           {
@@ -59,7 +60,7 @@ exports.handler = async (event, context) => {
               },
               {
                 type: 'text',
-                text: text || 'Please extract all the text content from this PDF document. Preserve the structure and formatting as much as possible.'
+                text: text || 'Please extract all the text content from this PDF document.'
               }
             ]
           }
@@ -67,13 +68,15 @@ exports.handler = async (event, context) => {
       })
     });
 
+    const responseText = await response.text();
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', errorText);
-      throw new Error(`Anthropic API error: ${response.status}`);
+      console.error('Anthropic API error response:', responseText);
+      throw new Error(`Anthropic API error: ${response.status} - ${responseText}`);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
 
     return {
       statusCode: 200,
@@ -94,7 +97,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ 
         error: 'PDF extraction failed', 
         details: error.message,
-        content: [{ text: 'Error extracting PDF: ' + error.message }]
+        content: [{ text: `Error extracting PDF: ${error.message}` }]
       })
     };
   }
