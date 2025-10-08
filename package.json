@@ -1,0 +1,12 @@
+{
+  "name": "econograph",
+  "version": "1.0.0",
+  "description": "Economic Research Visualization Tool",
+  "scripts": {
+    "dev": "npx serve public",
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
