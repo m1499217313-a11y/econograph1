@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({
         model: 'claude-3-haiku-20240307',  // CORRECT MODEL NAME
-        max_tokens: maxTokens || 4096,
+        max_tokens: maxTokens || 10000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
