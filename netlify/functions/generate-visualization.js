@@ -40,7 +40,7 @@ exports.handler = async (event, context) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-sonnet-20240229',  // CORRECT MODEL NAME
+        model: 'claude-sonnet-4-5-20250929',  // CORRECT MODEL NAME
         max_tokens: maxTokens || 4096,
         messages: [{ role: 'user', content: prompt }]
       })
